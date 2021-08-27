@@ -8,20 +8,21 @@ describe DockingStation do
     end
 
     it "get a bike from .release_bike" do
-      bike = Bike.new
+      bike = double(:bike, broken?: nil)
       subject.dock(bike)
       expect(subject.release_bike).to eq(bike)
     end
 
-    it "expects a bike to be working" do
-      bike = Bike.new
-      subject.dock(bike)
-      expect(subject.release_bike.working?).to eq true
-    end
+    # removed working? method as broken? method now exists
+    # it "expects a bike to be working" do
+    #   bike = double :bike
+    #   subject.dock(bike)
+    #   expect(subject.release_bike.working?).to eq true
+    # end
 
     it "doesn't release a broken bike" do
-      # this stores the bike as 'true' for some reason
-      bike = Bike.new
+      bike = double(:bike, report_broken: true, broken?: true)
+      # allow(bike).to receive(report_broken).and_return(true)
       bike.report_broken
       subject.dock(bike)
       expect { subject.release_bike }.to raise_error 'No bikes available'
@@ -33,18 +34,16 @@ describe DockingStation do
   end
 
   describe '#dock' do
-    it "responds to #dock with 1 argument" do
-      expect(subject).to respond_to(:dock).with(1).argument
-    end
+    it { is_expected.to respond_to(:dock).with(1).argument }
 
     it "able to dock bike if empty" do
-      bike = Bike.new
+      bike = double :bike
       expect(subject.dock(bike)).to eq([bike])
     end
 
     it "raises an error when full" do
-      subject.capacity.times { subject.dock(Bike.new) }
-      expect { subject.dock(Bike.new) }.to raise_error 'Docking station full'
+      subject.capacity.times { subject.dock(double :bike) }
+      expect { subject.dock(double :bike) }.to raise_error 'Docking station full'
     end
   end
 
