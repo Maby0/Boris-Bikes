@@ -19,6 +19,14 @@ describe DockingStation do
       expect(subject.release_bike.working?).to eq true
     end
 
+    it "doesn't release a broken bike" do
+      # this stores the bike as 'true' for some reason
+      bike = Bike.new
+      bike.report_broken
+      subject.dock(bike)
+      expect { subject.release_bike }.to raise_error 'No bikes available'
+    end
+
     it "raises an error when there are no bikes available" do
       expect { subject.release_bike }.to raise_error 'No bikes available'
     end
@@ -42,9 +50,9 @@ describe DockingStation do
 
   describe '#bike attribute' do
     it "is now private - doesn't respond to bikes attribute" do
-      expect { subject.bikes }.to raise_error 
+      expect { subject.bikes }.to raise_error(NoMethodError)
     end
-    
+
     # below test not applicable any more?
     # it "returns docked bikes" do
     #   bike = Bike.new
