@@ -4,7 +4,7 @@ describe DockingStation do
   describe '#release_bike' do
     it "DockingStation object to respond to #release_bike" do
       expect(subject).to respond_to(:release_bike)
-      # it { is_expected.to respond_to :release_bike }
+      # one-liner version of above: it { is_expected.to respond_to :release_bike }
     end
 
     it "get a bike from .release_bike" do
@@ -17,7 +17,6 @@ describe DockingStation do
       bike = Bike.new
       subject.dock(bike)
       expect(subject.release_bike.working?).to eq true
-      # expect(Bike.new).to be_working
     end
 
     it "raises an error when there are no bikes available" do
@@ -36,20 +35,42 @@ describe DockingStation do
     end
 
     it "raises an error when full" do
-      DockingStation::DEFAULT_CAPACITY.times { subject.dock(Bike.new) }
+      subject.capacity.times { subject.dock(Bike.new) }
       expect { subject.dock(Bike.new) }.to raise_error 'Docking station full'
     end
   end
 
   describe '#bike attribute' do
-    it "responds to bike method" do
-      expect(subject).to respond_to(:bikes)
+    it "is now private - doesn't respond to bikes attribute" do
+      expect { subject.bikes }.to raise_error 
+    end
+    
+    # below test not applicable any more?
+    # it "returns docked bikes" do
+    #   bike = Bike.new
+    #   subject.dock(bike)
+    #   expect(subject.bikes).to eq([bike])
+    # end
+  end
+
+
+
+  describe 'initialization' do
+    it "responds to capacity attribute" do
+      expect(subject).to respond_to(:capacity)
     end
 
-    it "returns docked bikes" do
-      bike = Bike.new
-      subject.dock(bike)
-      expect(subject.bikes).to eq([bike])
+    subject { DockingStation.new }
+    let(:bike) { Bike.new }
+    it 'defaults capacity' do
+      described_class::DEFAULT_CAPACITY.times { subject.dock(bike) }
+      expect { subject.dock(bike) }.to raise_error 'Docking station full'
+    end
+
+    it "has a variable capacity" do
+      docking_station = DockingStation.new(50)
+      50.times { docking_station.dock(bike) }
+      expect { docking_station.dock(bike) }.to raise_error 'Docking station full'
     end
   end
 end
